@@ -1,14 +1,32 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../firebase.js";
 
 const Signin = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log({ email, password });
+
+    await signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // Signed in
+        const user = userCredential.user;
+        console.log(user);
+        navigate("/");
+        // ...
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log(errorCode, errorMessage);
+        // ..
+      });
   };
   return (
     <React.Fragment>
@@ -22,7 +40,7 @@ const Signin = () => {
             className="w-full flex flex-col items-center gap-y-6"
           >
             <div className="w-full flex justify-center items-center">
-              <span className="text-2xl font-bold text-[#F4F4F5]">Signin</span>
+              <span className="text-2xl font-bold text-[#F4F4F5]"> Login</span>
             </div>
             <input
               type="text"
