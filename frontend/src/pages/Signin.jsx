@@ -1,8 +1,14 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { toast as tt } from "react-toastify";
+import {
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+} from "firebase/auth";
 import { auth } from "../../firebase.js";
+import "react-toastify/dist/ReactToastify.css";
 
 const Signin = () => {
   const navigate = useNavigate();
@@ -23,9 +29,49 @@ const Signin = () => {
       })
       .catch((error) => {
         const errorCode = error.code;
+        console.log(errorCode);
+        var errorMessage = "";
+        if (errorCode === "auth/user-not-found") {
+          errorMessage = "User not found!";
+        } else if (errorCode === "auth/wrong-password") {
+          errorMessage = "Wrong password!";
+        }
+        tt.error(`${errorMessage}`, {
+          position: "bottom-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
+      });
+  };
+
+  const handleGoogleLogin = async () => {
+    const provider = new GoogleAuthProvider();
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const token = credential.accessToken;
+        // The signed-in user info.
+        const user = result.user;
+
+        console.log(user);
+        navigate("/");
+      })
+      .catch((error) => {
+        // Handle Errors here.
+        const errorCode = error.code;
         const errorMessage = error.message;
+        // The email of the user's account used.
+        const email = error.customData.email;
+        // The AuthCredential type that was used.
+        const credential = GoogleAuthProvider.credentialFromError(error);
+        // ...
         console.log(errorCode, errorMessage);
-        // ..
       });
   };
   return (
@@ -65,6 +111,7 @@ const Signin = () => {
               className="bg-black p-4 w-[80%] text-[#F4F4F5] outline-none border-[1px] border-gray-800 focus:border-2 focus:border-[#323A96]"
             />
             <div
+              onClick={handleGoogleLogin}
               style={{
                 borderTopLeftRadius: "25px",
                 borderBottomRightRadius: "25px",
