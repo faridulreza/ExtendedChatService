@@ -9,17 +9,17 @@ const navbarItems = [
     url: "/",
   },
   {
-    id: 1,
+    id: 2,
     title: "Chatbot",
     url: "/chatbot",
   },
   {
-    id: 2,
+    id: 3,
     title: "About",
     url: "/about",
   },
   {
-    id: 3,
+    id: 4,
     title: "Contact",
     url: "/contact",
   },
