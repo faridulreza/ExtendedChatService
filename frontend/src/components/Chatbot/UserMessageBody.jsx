@@ -2,6 +2,7 @@ import axios from "axios";
 import { getAuth } from "firebase/auth";
 
 import React, { useEffect } from "react";
+import FileViewer from "./FileViewer";
 
 const UserMessageBody = ({ data }) => {
   return (
@@ -14,7 +15,10 @@ const UserMessageBody = ({ data }) => {
           />
         </div>
         <div className="relative mr-3 text-md bg-[#323A96] text-white py-2 px-4 shadow rounded-xl">
-          <div>{data.content}</div>
+          {data.content && <div>{data.content}</div>}
+          {data.file && (
+            <FileViewer file={data.file} fileType={data.fileType} />
+          )}
         </div>
       </div>
     </div>

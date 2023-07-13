@@ -7,6 +7,7 @@ import { getFirestore, getDoc, doc, updateDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import axios from "axios";
 const BACKEND_URL = "http://localhost:3000/api/v1";
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 
 const getPreviousMessages = (chatData) => {
   let dataArr = [...chatData];
@@ -102,27 +103,150 @@ const ChatBotMain = ({ chatID }) => {
     });
   };
 
-  const picDetails = async (pics) => {
-    if (pics === undefined) {
-      alert("Use proper type Images.");
+  const sendAudio = async (url) => {
+    let newObj = {
+      timestamp: Date.now(),
+      role: "user",
+      file: url,
+      fileType: "audio",
+    };
+
+    setChatData([
+      ...chatData,
+      newObj,
+      {
+        timestamp: newObj.timestamp + 1,
+        role: "assistant",
+        lookForUpdate: true,
+        tts: true,
+        updatePath:
+          getAuth().currentUser.uid + "/" + chatID + "/" + newObj.timestamp,
+      },
+    ]);
+    setTypedText("");
+
+    await axios.post(
+      BACKEND_URL + "/chat",
+      {
+        chatID,
+        timestamp: newObj.timestamp,
+        prevMessage: getPreviousMessages(chatData),
+        file: url,
+        fileType: "audio",
+      },
+      {
+        headers: {
+          Authorization: "bearer " + (await getAuth().currentUser.getIdToken()),
+        },
+      }
+    );
+
+    const cont = document.getElementById("overflowBar");
+    cont.scrollTop = cont.scrollHeight + 1000;
+
+    //add the message to database
+
+    const dc = doc(getFirestore(), getAuth().currentUser.uid + "/" + chatID);
+
+    await updateDoc(dc, {
+      [newObj.timestamp]: {
+        role: "user",
+        file: url,
+        fileType: "audio",
+      },
+    });
+  };
+
+  const sendFile = async (url, type) => {
+    let newObj = {
+      timestamp: Date.now(),
+      role: "user",
+      file: url,
+      fileType: type,
+    };
+
+    setChatData([
+      ...chatData,
+      newObj,
+      {
+        timestamp: newObj.timestamp + 1,
+        role: "assistant",
+        lookForUpdate: true,
+        updatePath:
+          getAuth().currentUser.uid + "/" + chatID + "/" + newObj.timestamp,
+      },
+    ]);
+    setTypedText("");
+
+    await axios.post(
+      BACKEND_URL + "/chat",
+      {
+        chatID,
+        timestamp: newObj.timestamp,
+        prevMessage: getPreviousMessages(chatData),
+        file: url,
+        fileType: type,
+      },
+      {
+        headers: {
+          Authorization: "bearer " + (await getAuth().currentUser.getIdToken()),
+        },
+      }
+    );
+
+    const cont = document.getElementById("overflowBar");
+    cont.scrollTop = cont.scrollHeight + 1000;
+
+    //add the message to database
+
+    const dc = doc(getFirestore(), getAuth().currentUser.uid + "/" + chatID);
+
+    await updateDoc(dc, {
+      [newObj.timestamp]: {
+        role: "user",
+        file: url,
+        fileType: type,
+      },
+    });
+  };
+
+  const fileUpload = async (file) => {
+    if (file === undefined) {
+      console.log("no file");
       return;
     }
+
     try {
-      if (
-        pics.type === "image/jpeg" ||
-        pics.type === "image/png" ||
-        pic.type === "pdf" ||
-        pic.type === "txt"
-      ) {
-        const data = new FormData();
-        data.append("file", pics);
-        data.append("upload_preset", "chat-app");
-        data.append("cloud_name", "shanto78");
-        // const imgData = await axios.post(
-        //   "https://api.cloudinary.com/v1_1/shanto78/image/upload",
-        //   data
-        // );
-        // setPic(imgData.data.url.toString());
+      const storage = getStorage();
+      if (file.type === "image/jpeg" || file.type === "image/png") {
+        let ext = "jpeg";
+        if (file.type === "image/png") ext = "png";
+
+        const storageRef = ref(storage, "uploaded/" + Date.now() + "." + ext);
+
+        const rf = await uploadBytes(storageRef, file, {
+          contentType: file.type,
+        });
+
+        const url = await getDownloadURL(rf.ref);
+
+        sendFile(url, "image");
+      } else if (file.type === "application/pdf") {
+        const storageRef = ref(storage, "uploaded/" + Date.now() + ".pdf");
+
+        const rf = await uploadBytes(storageRef, file);
+
+        const url = await getDownloadURL(rf.ref);
+
+        sendFile(url, "pdf");
+      } else if (file.type === "text/plain") {
+        const storageRef = ref(storage, "uploaded/" + Date.now() + ".txt");
+
+        const rf = await uploadBytes(storageRef, file);
+
+        const url = await getDownloadURL(rf.ref);
+
+        sendFile(url, "txt");
       }
     } catch (error) {
       console.log(error);
@@ -132,7 +256,7 @@ const ChatBotMain = ({ chatID }) => {
     <React.Fragment>
       {speechModal && (
         <Modal>
-          <SpeechBox setSpeechModal={setSpeechModal} />
+          <SpeechBox setSpeechModal={setSpeechModal} sendAudio={sendAudio} />
         </Modal>
       )}
 
@@ -202,7 +326,8 @@ const ChatBotMain = ({ chatID }) => {
                             id="dropzone-file"
                             type="file"
                             className="hidden"
-                            onChange={(e) => picDetails(e.target.files[0])}
+                            accept=".jpg, .png, .jpeg, .txt, .pdf"
+                            onChange={(e) => fileUpload(e.target?.files[0])}
                           />
                         </label>
                       </div>

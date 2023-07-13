@@ -4,6 +4,7 @@ import { getDatabase, onValue, ref, remove, update } from "firebase/database";
 import { LineWave, FallingLines } from "react-loader-spinner";
 import { getAuth } from "firebase/auth";
 import { doc, getFirestore, updateDoc } from "firebase/firestore";
+import FileViewer from "./FileViewer";
 
 const ERROR_FILE_PROSESSING = -1001;
 const ERROR_GETTING_CHAT_RESPONSE = -1002;
@@ -50,6 +51,7 @@ const HandleLoading = ({ data }) => {
 const HandleData = ({ data, chatID, update }) => {
   const [msg, setMsg] = useState(data.message);
   const [isGenFile, setIsGenFile] = useState(false);
+  const [playedOnce, setPlayedOnce] = useState(false);
 
   useEffect(() => {
     const doIt = async () => {
@@ -81,7 +83,23 @@ const HandleData = ({ data, chatID, update }) => {
     doIt();
   }, []);
 
-  return <div style={{ whiteSpace: "pre-line" }}>{msg}</div>;
+  const tmsg = new SpeechSynthesisUtterance();
+  tmsg.text = msg;
+
+  useEffect(() => {
+    if (playedOnce) return;
+    if (!data.lookForUpdate) return;
+    window.speechSynthesis.speak(tmsg);
+    setPlayedOnce(true);
+    tmsg.text = "";
+  }, [tmsg, playedOnce]);
+
+  return (
+    <div>
+      {isGenFile && <FileViewer file={data.file} fileType={data.fileType} />}{" "}
+      {!isGenFile && <div style={{ whiteSpace: "pre-line" }}>{msg}</div>};
+    </div>
+  );
 };
 
 const SomeThingWentWrong = ({ data, update, index }) => {

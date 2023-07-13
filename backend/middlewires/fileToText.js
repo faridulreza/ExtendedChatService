@@ -10,7 +10,7 @@ const fs = require("fs");
 
 //function informs error
 const FileError = (res, req, err) => {
-  console.log(err);
+  console.log(err.response);
   res.status(400).json({
     message: "Sorry could not process your file :(",
     code: ERROR_FILE_PROSESSING,
