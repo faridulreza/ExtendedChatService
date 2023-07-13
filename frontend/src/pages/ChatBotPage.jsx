@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-// import Modal from "../components/Modal/Modal";
+import Modal from "../components/Modal/Modal";
+import SpeechBox from "../components/Chatbot/SpeechBox";
 
 const ChatBotPage = () => {
-  //   const [speechModal, setSpeechModal] = useState(false);
+  const [speechModal, setSpeechModal] = useState(false);
   const [pic, setPic] = useState();
 
   const picDetails = async (pics) => {
@@ -32,11 +33,11 @@ const ChatBotPage = () => {
   };
   return (
     <React.Fragment>
-      {/* {speechModal && (
+      {speechModal && (
         <Modal>
-          <SpeechBox />
+          <SpeechBox setSpeechModal={setSpeechModal} />
         </Modal>
-      )} */}
+      )}
       <div className="w-full h-screen flex justify-center items-start">
         <div className="w-[70%] flex justify-center items-center">
           <div className="flex h-[90vh] antialiased text-gray-800">
@@ -176,7 +177,7 @@ const ChatBotPage = () => {
                       </div>
                       <button
                         onClick={() => {
-                          //   setSpeechModal(true);
+                          setSpeechModal(true);
                         }}
                         className="flex items-center justify-center text-gray-400 hover:text-gray-600"
                       >
