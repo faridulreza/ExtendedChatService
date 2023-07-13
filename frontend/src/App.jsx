@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, BrowserRouter as Router } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import Signin from "./pages/Signin";
 import Signup from "./pages/Signup";
@@ -11,8 +11,9 @@ import ChatBotPage from "./pages/ChatBotPage";
 
 const App = () => {
   return (
-    <React.Fragment>
+    <Router>
       <Navbar />
+
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/about" element={<About />} />
@@ -20,8 +21,9 @@ const App = () => {
         <Route path="/signup" element={<Signup />} />
         <Route path="/chatbot" element={<ChatBotPage />} />
       </Routes>
+
       <Footer />
-    </React.Fragment>
+    </Router>
   );
 };
 

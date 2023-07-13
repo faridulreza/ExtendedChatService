@@ -1,8 +1,15 @@
 import React, { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { Link, useNavigate } from "react-router-dom";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  updateProfile,
+  signInWithPopup,
+  GoogleAuthProvider,
+} from "firebase/auth";
 import { auth } from "../../firebase.js";
+import { toast as tt } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Signin = () => {
   const navigate = useNavigate();
@@ -31,7 +38,53 @@ const Signin = () => {
       })
       .catch((error) => {
         const errorCode = error.code;
+        var errorMessage = "";
+        if (errorCode === "auth/email-already-in-use") {
+          errorMessage = "Email already in use!";
+        } else if (errorCode === "auth/invalid-email") {
+          errorMessage = "Invalid email!";
+        } else if (errorCode === "auth/weak-password") {
+          errorMessage = "Weak password!";
+        } else if (errorCode === "auth/operation-not-allowed") {
+          errorMessage = "Operation not allowed!";
+        }
+
+        console.log(errorCode, errorMessage);
+        tt.error(`${errorMessage}`, {
+          position: "bottom-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
+      });
+  };
+
+  const handleGoogleSignIn = async () => {
+    const provider = new GoogleAuthProvider();
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const token = credential.accessToken;
+        // The signed-in user info.
+        const user = result.user;
+
+        console.log(user);
+        navigate("/");
+      })
+      .catch((error) => {
+        // Handle Errors here.
+        const errorCode = error.code;
         const errorMessage = error.message;
+        // The email of the user's account used.
+        const email = error.customData.email;
+        // The AuthCredential type that was used.
+        const credential = GoogleAuthProvider.credentialFromError(error);
+        // ...
         console.log(errorCode, errorMessage);
       });
   };
@@ -80,6 +133,7 @@ const Signin = () => {
               className="bg-black p-4 w-[80%] text-[#F4F4F5] outline-none border-[1px] border-gray-800 focus:border-2 focus:border-[#323A96]"
             />
             <div
+              onClick={handleGoogleSignIn}
               style={{
                 borderTopLeftRadius: "25px",
                 borderBottomRightRadius: "25px",
