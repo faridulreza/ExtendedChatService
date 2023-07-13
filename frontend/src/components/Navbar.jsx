@@ -54,10 +54,7 @@ const Navbar = () => {
   window.addEventListener("scroll", changeNavbarColor);
 
   const handleSignOut = () => {
-    // Implement the sign-out functionality using Firebase
     getAuth().signOut();
-    // console.log(user);
-    // setUser()
     navigate("/signin");
   };
   return (
@@ -71,7 +68,7 @@ const Navbar = () => {
       >
         <div className="w-[65%] bg-transparent flex justify-between items-center p-5">
           <Link to={"/"} className="text-2xl font-bold text-[#F4F4F5]">
-            Title
+            ChatBot++
           </Link>
           <ul className="flex justify-start gap-x-10 items-center">
             {navbarItems.map((item) => (
@@ -89,13 +86,12 @@ const Navbar = () => {
                 to={"/signin"}
                 className="text-[#F4F4F5] border-[1px] px-4 py-1 border-gray-800 hover:bg-[#323A96]"
               >
-                {/* {user == null ? "Signin" : "Logout"} */}
                 Signin
               </Link>
             ) : (
               <button
                 onClick={handleSignOut}
-                className="text-[#F4F4F5]  bg-red-500 text-black first-letter: border-[1px] px-4 py-1 border-gray-800 hover:bg-red-300"
+                className="  text-[#FF0000] first-letter: border-[1px] px-4 py-1 border-gray-800"
               >
                 Logout
               </button>

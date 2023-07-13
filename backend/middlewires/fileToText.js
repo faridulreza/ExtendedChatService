@@ -1,15 +1,24 @@
-const { FILE_PROSESSING_ERROR } = require("../status_codes.js");
+const {
+  ERROR_FILE_PROSESSING,
+  PROCESSING_FILE,
+} = require("../status_codes.js");
 const tesseract = require("node-tesseract-ocr");
 const Downloader = require("nodejs-file-downloader");
 const { OpenAIApi, Configuration } = require("openai");
+const { getDatabase } = require("firebase-admin/database");
 const fs = require("fs");
 
 //function informs error
-const FileError = (res, err) => {
+const FileError = (res, req, err) => {
   console.log(err);
-  return res.status(400).json({
+  res.status(400).json({
     message: "Sorry could not process your file :(",
-    code: FILE_PROSESSING_ERROR,
+    code: ERROR_FILE_PROSESSING,
+  });
+
+  getDatabase().ref(req.updatePath).update({
+    message: "Sorry could not process your file :(",
+    code: ERROR_FILE_PROSESSING,
   });
 };
 
@@ -27,9 +36,20 @@ const tesrConfig = {
   psm: 3,
 };
 
+function removeFile(path) {
+  try {
+    fs.unlinkSync(path);
+  } catch (e) {}
+}
+
 //convert the pdf , image or audio to file to text
 const FileToText = async (req, res, next) => {
   if (req.body.file && req.body.fileType) {
+    console.log("path: " + req.updatePath);
+    await getDatabase().ref(req.updatePath).update({
+      message: "Processing file...",
+      code: PROCESSING_FILE,
+    });
     const fileURL = req.body.file;
     const fileType = req.body.fileType;
 
@@ -61,7 +81,7 @@ const FileToText = async (req, res, next) => {
         next();
 
         //remove the file
-        fs.unlink(filePath);
+        removeFile(filePath);
         return;
       }
 
@@ -71,7 +91,7 @@ const FileToText = async (req, res, next) => {
         var data = fs.readFileSync(filePath, "utf8");
         req.body.text = data.toString();
 
-        fs.unlink(filePath);
+        removeFile(filePath);
         next();
         return;
       }
@@ -87,8 +107,8 @@ const FileToText = async (req, res, next) => {
         var processor = pdf_extract(filePath, options, function (err) {
           if (err) {
             //remove the file
-            fs.unlink(filePath);
-            return FileError(res);
+            removeFile(filePath);
+            return FileError(res, req);
           }
         });
         processor.on("complete", function (data) {
@@ -96,22 +116,22 @@ const FileToText = async (req, res, next) => {
 
           req.body.text = text;
           //remove the file
-          fs.unlink(filePath);
+          removeFile(filePath);
           next();
         });
         processor.on("error", function (err) {
           //remove the file
-          fs.unlink(filePath);
-          return FileError(res);
+          removeFile(filePath);
+          return FileError(res, req);
         });
 
         return;
       }
 
       next();
-      fs.unlink(filePath);
+      removeFile(filePath);
     } catch (err) {
-      FileError(res, err);
+      FileError(res, req, err);
     }
   } else next();
 };

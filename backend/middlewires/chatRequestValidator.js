@@ -7,6 +7,7 @@
  * The body must have These schema:
  * {
  *  timestamp: number,
+ *  chatID: string,
  *  prevMessage: array of objects,
  *  text: string,
  *  //text or these two fields
@@ -32,6 +33,14 @@ const reqObjectValidator = (req, res, next) => {
     return;
   }
 
+  if (!req.body.chatID) {
+    res.status(400).json({
+      message: "Missing chatID",
+    });
+
+    return;
+  }
+
   if (!req.body.prevMessage || typeof req.body.prevMessage !== "object") {
     res.status(400).json({
       message: "Missing previos messages",
@@ -47,6 +56,12 @@ const reqObjectValidator = (req, res, next) => {
     return;
   }
 
+  console.log(req.body);
+  //build the path where we need to put update
+  req.updatePath =
+    req.user.uid + "/" + req.body.chatID + "/" + req.body.timestamp;
+
+  console.log(req.updatePath);
   next();
 };
 

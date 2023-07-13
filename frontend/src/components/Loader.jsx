@@ -1,11 +1,13 @@
 import React from "react";
 
-const Loader = () => {
+const Loader = ({ size }) => {
   return (
     <div className="w-full h-screen flex justify-center items-center">
       <div aria-label="Loading..." role="status">
         <svg
-          className="h-20 w-20 animate-spin stroke-gray-500"
+          className={`h-${size || 20} w-${
+            size || 20
+          } animate-spin stroke-gray-500`}
           viewBox="0 0 256 256"
         >
           <line
