@@ -6,13 +6,18 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "bee-queue": "^1.5.0",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
+    "dotenv": "^16.3.1",
     "express": "~4.16.1",
     "firebase-admin": "^11.10.0",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
     "morgan": "~1.9.1",
-    "openai": "^3.3.0"
+    "node-tesseract-ocr": "^2.2.1",
+    "nodejs-file-downloader": "^4.12.1",
+    "openai": "^3.3.0",
+    "pdf-extract": "^1.0.11"
   }
 }

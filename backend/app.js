@@ -3,7 +3,12 @@ var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
+
+//load firebase
 require("./firebase.js");
+
+//load .env
+require("dotenv").config();
 
 var v1Router = require("./api/v1/index.js");
 var app = express();

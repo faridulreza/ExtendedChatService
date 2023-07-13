@@ -7,6 +7,7 @@
  * The body must have These schema:
  * {
  *  timestamp: number,
+ *  prevMessage: array of objects,
  *  text: string,
  *  //text or these two fields
  *  file: URL,
@@ -14,7 +15,7 @@
  * }
  */
 
-const reqObjectValidator = (req, res) => {
+const reqObjectValidator = (req, res, next) => {
   if (!req.body) {
     res.status(400).json({
       message: "No request body",
@@ -31,7 +32,14 @@ const reqObjectValidator = (req, res) => {
     return;
   }
 
-  if (!req.body.text || !(req.body.file && req.body.fileType)) {
+  if (!req.body.prevMessage || typeof req.body.prevMessage !== "object") {
+    res.status(400).json({
+      message: "Missing previos messages",
+    });
+    return;
+  }
+
+  if (!req.body.text && !(req.body.file && req.body.fileType)) {
     res.status(400).json({
       message: "Missing text or file information",
     });
@@ -41,3 +49,5 @@ const reqObjectValidator = (req, res) => {
 
   next();
 };
+
+module.exports = reqObjectValidator;

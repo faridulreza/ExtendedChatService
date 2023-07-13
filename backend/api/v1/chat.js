@@ -1,18 +1,73 @@
 const router = require("express").Router();
+const { queues, generationTarget } = require("../../pipelines/queue"); //<-- add more brunches here to make the system be able to generate more things
+const { Configuration, OpenAIApi } = require("openai");
 
 // System role for gpt3.5 turbo
 // detail: https://platform.openai.com/docs/api-reference/chat
 let systemRole = "You will act as a normal Assistant. But";
 
-// instruct the system to reply with a specific keyword
-// to brunch to a specific pipeline
-const systemBrunches = ["book", "kid's book", "blog"];
-
 //build the complete system role
-systemBrunches.forEach((brunch) => {
+generationTarget.forEach((branch) => {
   systemRole +=
-    `\nif user wants to make/generate a ${brunch} ` +
-    `about any topic you must reply with '$GENERATE$ #${brunch.toUpperCase()}'.`;
+    `\nif user wants to make/generate a ${branch} ` +
+    `about any topic and topic is given you must reply with 'GENERATING ${branch.toUpperCase()}'.`;
 });
 
-async (req, res) => {};
+const configuration = new Configuration({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+const openai = new OpenAIApi(configuration);
+
+module.exports = async (req, res) => {
+  // //build the message array . includes the previous messages
+  // let prevMessage = req.body.prevMessage;
+  // //only take last 4 messages
+  // if (prevMessage.length > 5) {
+  //   prevMessage = prevMessage.slice(prevMessage.length - 5);
+  // }
+
+  // let messages = [
+  //   { role: "system", content: systemRole },
+  //   ...req.body.prevMessage,
+  //   { role: "user", content: req.body.text },
+  // ];
+
+  // //get response from gpt3.5 turbo
+  // const response = await openai.createChatCompletion({
+  //   model: "gpt-3.5-turbo",
+  //   messages,
+  //   temperature: 1,
+  //   max_tokens: 512,
+  //   top_p: 1,
+  //   frequency_penalty: 0,
+  //   presence_penalty: 0,
+  // });
+
+  // let choice = response.data.choices[0];
+
+  // if (choice.finish_reason === "length") {
+  //   choice.message.content = choice.message.content + "...";
+  // }
+
+  // //if the system wants to generate something
+  // //create a job for the specific task queue
+  // if (choice.message.content.startsWith("GENERATING ")) {
+  //   let msg = choice.message.content.split(" ")[1].toLowerCase().trim();
+
+  //   //remove any punctuation
+  //   const target = msg.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "");
+  //   queues[target]
+  //     .createJob({
+  //       text: req.body.text,
+  //       timestamp: req.body.timestamp,
+  //       uid: req.user.uid,
+  //     })
+  //     .save();
+  // }
+
+  //send response
+  // res.status(200).json(choice.message);
+
+  res.status(200).json({ text: req.body.text });
+};
