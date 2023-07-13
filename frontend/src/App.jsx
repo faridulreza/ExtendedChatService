@@ -8,6 +8,8 @@ import Navbar from "./components/Navbar";
 import "./App.css";
 import About from "./pages/About";
 import ChatBotPage from "./pages/ChatBotPage";
+import PdfShare from "./pages/PdfShare";
+import SinglePdf from "./pages/SinglePdf";
 
 const App = () => {
   return (
@@ -20,6 +22,8 @@ const App = () => {
         <Route path="/signin" element={<Signin />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/chatbot" element={<ChatBotPage />} />
+        <Route path="/pdfshare" element={<PdfShare />} />
+        <Route path="/pdf/:id" element={<SinglePdf />} />
       </Routes>
 
       <Footer />
