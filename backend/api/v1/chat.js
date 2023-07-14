@@ -2,6 +2,7 @@ const router = require("express").Router();
 const { queues, generationTarget } = require("../../pipelines/queue"); //<-- add more brunches here to make the system be able to generate more things
 const { Configuration, OpenAIApi } = require("openai");
 const {
+  FILE_GENERATING,
   ERROR_GETTING_CHAT_RESPONSE,
   ALL_DONE,
 } = require("./../../status_codes");
@@ -14,7 +15,7 @@ let systemRole = "You will act as a normal Assistant. But";
 generationTarget.forEach((branch) => {
   systemRole +=
     `\nif user wants to make/generate a ${branch} ` +
-    `about any topic and topic is given you must reply with 'GENERATING ${branch.toUpperCase()}'.`;
+    `about any topic and topic is given you must reply with 'GENERATING ${branch.toUpperCase()}##'.`;
 });
 
 const configuration = new Configuration({
@@ -58,10 +59,13 @@ module.exports = async (req, res) => {
     //if the system wants to generate something
     //create a job for the specific task queue
     if (choice.message.content.startsWith("GENERATING ")) {
-      let msg = choice.message.content.split(" ")[1].toLowerCase().trim();
+      let end = choice.message.content.indexOf("##");
+      let msg = choice.message.content.substring(11, end).trim();
+      msg = msg.toLocaleLowerCase();
 
       //remove any punctuation
-      const target = msg.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "");
+      const target = msg.replace(/[.,\/#!$%\^&\*;:{}=\-`~()]/g, "");
+      console.log(choice.message, target);
       queues[target]
         .createJob({
           text: req.body.text,
