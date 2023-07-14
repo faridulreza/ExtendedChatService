@@ -71,6 +71,11 @@ const HandleData = ({ data, chatID, update }) => {
         content: data.message,
       };
 
+      if (data.file) {
+        obj[now_time].file = data.file;
+        obj[now_time].fileType = data.fileType;
+      }
+
       if (msg.startsWith("https://")) {
         obj.generatedFile = true;
         setIsGenFile(true);

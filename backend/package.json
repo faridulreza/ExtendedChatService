@@ -14,11 +14,13 @@
     "express": "~4.16.1",
     "firebase-admin": "^11.10.0",
     "http-errors": "~1.6.3",
+    "image-to-base64": "^2.2.0",
     "jade": "~1.11.0",
     "morgan": "~1.9.1",
     "node-tesseract-ocr": "^2.2.1",
     "nodejs-file-downloader": "^4.12.1",
     "openai": "^3.3.0",
-    "pdf-extract": "^1.0.11"
+    "pdf-extract": "^1.0.11",
+    "pdfmake": "^0.2.7"
   }
 }
