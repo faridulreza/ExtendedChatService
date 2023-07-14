@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Modal from "../Modal/Modal";
 import SpeechBox from "./SpeechBox";
 import UserMessageBody from "./UserMessageBody";
-import AIMessageBody from "./AIMessageBody";
+import AIMessageBody, { SimpleAI } from "./AIMessageBody";
 import { getFirestore, getDoc, doc, updateDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import axios from "axios";
@@ -24,9 +24,12 @@ const ChatBotMain = ({ chatID }) => {
   const [chatData, setChatData] = useState([]);
   const [typedText, setTypedText] = useState("");
   const [speechModal, setSpeechModal] = useState(false);
-  const [apiCallData, setApiCallData] = useState(null);
+  const [nameOfChat, setNameOfChat] = useState(null);
 
-  const [pic, setPic] = useState();
+  useEffect(() => {
+    const cont = document.getElementById("overflowBar");
+    cont.scrollTop = cont.scrollHeight;
+  }, [chatData]);
 
   useEffect(() => {
     const getData = async () => {
@@ -36,11 +39,23 @@ const ChatBotMain = ({ chatID }) => {
       let dataArr = [];
 
       Object.keys(data).forEach((n, i) => {
-        if (n === "name") return;
-        dataArr.push({
+        if (n === "name") {
+          if (data[n] !== "Unnamed Chat") {
+            setNameOfChat(data[n]);
+          }
+          return;
+        }
+
+        let obj = {
           timestamp: n,
           ...data[n],
-        });
+        };
+
+        if (obj.role === "assistant") {
+          obj.fromDB = true;
+        }
+
+        dataArr.push(obj);
       });
 
       dataArr.sort((a, b) => a.timestamp - b.timestamp);
@@ -51,7 +66,7 @@ const ChatBotMain = ({ chatID }) => {
     if (chatID) {
       getData();
     }
-  }, []);
+  }, [chatID]);
 
   const sendText = async (e) => {
     let newObj = {
@@ -88,19 +103,22 @@ const ChatBotMain = ({ chatID }) => {
       }
     );
 
-    const cont = document.getElementById("overflowBar");
-    cont.scrollTop = cont.scrollHeight + 1000;
-
     //add the message to database
 
     const dc = doc(getFirestore(), getAuth().currentUser.uid + "/" + chatID);
 
-    await updateDoc(dc, {
+    const updateObj = {
       [newObj.timestamp]: {
         role: "user",
         content: newObj.content,
       },
-    });
+    };
+
+    if (!nameOfChat) {
+      updateObj.name = newObj.content;
+      setNameOfChat(newObj.content);
+    }
+    await updateDoc(dc, updateObj);
   };
 
   const sendAudio = async (url) => {
@@ -278,27 +296,29 @@ const ChatBotMain = ({ chatID }) => {
                           </div>
                         )}
 
-                          {chatData.map((d, i) => {
-                            if (d.role === "user")
-                              return (
-                                <UserMessageBody key={d.timestamp} data={d} />
-                              );
-                            else
-                              return (
-                                <AIMessageBody
-                                  key={d.timestamp}
-                                  chatID={chatID}
-                                  setChatData={setChatData}
-                                  data={d}
-                                  update={(d) => {
-                                    let tmp = [...chatData];
-                                    tmp[i] = d;
-                                    setChatData(tmp);
-                                  }}
-                                />
-                              );
-                          })}
-                        </div>
+                        {chatData.map((d, i) => {
+                          if (d.role === "user")
+                            return (
+                              <UserMessageBody key={d.timestamp} data={d} />
+                            );
+                          else if (d.fromDB) {
+                            return <SimpleAI key={d.timestamp} data={d} />;
+                          } else
+                            return (
+                              <AIMessageBody
+                                key={d.timestamp}
+                                chatID={chatID}
+                                setChatData={setChatData}
+                                data={d}
+                                update={(d) => {
+                                  let tmp = [...chatData];
+                                  tmp[i] = d;
+                                  setChatData(tmp);
+                                }}
+                              />
+                            );
+                        })}
+                      </div>
                     </div>
                   </div>
 

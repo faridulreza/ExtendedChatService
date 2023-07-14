@@ -15,7 +15,7 @@ let systemRole = "You will act as a normal Assistant. But";
 generationTarget.forEach((branch) => {
   systemRole +=
     `\nif user wants to make/generate a ${branch} ` +
-    `about any topic and topic is given you must reply with 'GENERATING ${branch.toUpperCase()}##'.`;
+    `about any topic and topic is given you MUST ONLY reply with 'GENERATING ${branch.toUpperCase()}##'.`;
 });
 
 const configuration = new Configuration({

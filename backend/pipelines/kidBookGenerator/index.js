@@ -46,11 +46,15 @@ const kidsBookGenerator = async (job, done) => {
           alignment: "center",
           fontSize: 23,
         });
+        contents.push("\n");
       } else if (line.startsWith("Chapter")) {
+        contents.push("\n");
         contents.push({
           text: line,
           style: "header",
+          fontSize: 18,
         });
+        contents.push("\n");
       } else if (line.startsWith("IMAGE")) {
         const response = await openai.createImage({
           prompt: line.split(":")[1],
@@ -62,12 +66,13 @@ const kidsBookGenerator = async (job, done) => {
 
         let base64_img =
           "data:image/png;base64," + (await imageToBase64(image_url));
-
+        contents.push("\n");
         contents.push({
           image: base64_img,
           width: 256,
           height: 256,
         });
+        contents.push("\n");
       } else {
         contents.push(line);
       }
@@ -90,6 +95,12 @@ const kidsBookGenerator = async (job, done) => {
       content: contents,
       defaultStyle: {
         font: "Courier",
+      },
+      styles: {
+        header: {
+          lineHeight: 1.5,
+          alignment: "justify",
+        },
       },
     };
 

@@ -52,6 +52,7 @@ const HandleData = ({ data, chatID, update }) => {
   const [msg, setMsg] = useState(data.message);
   const [isGenFile, setIsGenFile] = useState(false);
   const [playedOnce, setPlayedOnce] = useState(false);
+  console.log(data);
 
   useEffect(() => {
     const doIt = async () => {
@@ -76,7 +77,7 @@ const HandleData = ({ data, chatID, update }) => {
         obj[now_time].fileType = data.fileType;
       }
 
-      if (msg.startsWith("https://")) {
+      if (data.file) {
         obj.generatedFile = true;
         setIsGenFile(true);
       }
@@ -94,6 +95,7 @@ const HandleData = ({ data, chatID, update }) => {
   useEffect(() => {
     if (playedOnce) return;
     if (!data.lookForUpdate) return;
+    if (!data.tts) return;
     window.speechSynthesis.speak(tmsg);
     setPlayedOnce(true);
     tmsg.text = "";
@@ -101,8 +103,8 @@ const HandleData = ({ data, chatID, update }) => {
 
   return (
     <div>
-      {isGenFile && <FileViewer file={data.file} fileType={data.fileType} />}{" "}
-      {!isGenFile && <div style={{ whiteSpace: "pre-line" }}>{msg}</div>};
+      {data.file && <FileViewer file={data.file} fileType={data.fileType} />}
+      {!isGenFile && <div style={{ whiteSpace: "pre-line" }}>{msg}</div>}
     </div>
   );
 };
@@ -139,6 +141,8 @@ const AIMessageBody = ({ data, chatID, update }) => {
           setStatData(m_val);
         }
       });
+    } else if (statData == null) {
+      setStatData({ code: ALL_DONE });
     }
 
     return () => unsub();
@@ -166,6 +170,26 @@ const AIMessageBody = ({ data, chatID, update }) => {
               data={{ ...statData, ...data }}
               update={update}
             />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const SimpleAI = ({ data }) => {
+  return (
+    <div className=" col-start-1 col-end-8 p-3 rounded-lg">
+      <div className="flex flex-row items-center">
+        <div className="flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0">
+          AI
+        </div>
+        <div className="relative ml-3 text-md bg-indigo-300 py-2 px-4 shadow rounded-xl">
+          {data.file && (
+            <FileViewer file={data.file} fileType={data.fileType} />
+          )}
+          {!data.file && (
+            <div style={{ whiteSpace: "pre-line" }}>{data.content}</div>
           )}
         </div>
       </div>

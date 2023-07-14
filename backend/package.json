@@ -17,6 +17,7 @@
     "image-to-base64": "^2.2.0",
     "jade": "~1.11.0",
     "morgan": "~1.9.1",
+    "node-html-parser": "^6.1.5",
     "node-tesseract-ocr": "^2.2.1",
     "nodejs-file-downloader": "^4.12.1",
     "openai": "^3.3.0",
