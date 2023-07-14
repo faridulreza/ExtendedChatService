@@ -17,13 +17,13 @@ const PdfShareMain = () => {
     });
   };
 
-  const pdfDocument = pdfjs.getDocument("/sample.pdf");
-  const firstPage = pdfDocument.getPage(1);
-  const firstPageImage = firstPage.getImage({
-    format: "png",
-    width: 400,
-    height: 300,
-  });
+  // const pdfDocument = pdfjs.getDocument("/sample.pdf");
+  // const firstPage = pdfDocument.getPage(1);
+  // const firstPageImage = firstPage.getImage({
+  //   format: "png",
+  //   width: 400,
+  //   height: 300,
+  // });
   return (
     <React.Fragment>
       <div className="w-full flex flex-col items-center">
@@ -70,7 +70,7 @@ const PdfShareMain = () => {
             <div className="max-w-sm rounded overflow-hidden shadow-lg border-[1px] border-gray-800 hover:scale-[1.02] hover:delay-150 hover:duration-300 hover:shadow-[#F4F4F5] hover:shadow-sm">
               <img
                 className="w-full"
-                src={firstPageImage}
+                src="https://img.freepik.com/free-photo/cloud-download-icon-line-connection-circuit-board_1379-888.jpg?w=1380&t=st=1688566560~exp=1688567160~hmac=145b44fea15cf79611b73485ccd3a376d576d7ce4d687bc7bb8f77e9dac11a58"
                 alt="Sunset in the mountains"
               />
               <div className="px-6 py-4 flex justify-between items-center">
