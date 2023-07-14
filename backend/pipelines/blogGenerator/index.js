@@ -64,6 +64,7 @@ const blogGenerator = async (job, done) => {
       file: pubURL,
       fileType: "txt",
       message: "Generated!",
+      title: data.text,
     });
   } catch (e) {
     console.log(e);

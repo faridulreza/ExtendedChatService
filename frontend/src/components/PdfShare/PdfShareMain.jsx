@@ -3,18 +3,16 @@ import { BiSearch } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
 import { pdfjs } from "pdfjs-dist";
 
+
+const Card=({data})=>{
+
+  
+}
 const PdfShareMain = () => {
   const navigate = useNavigate();
   const onButtonClick = () => {
-    fetch("/sample.pdf").then((response) => {
-      response.blob().then((blob) => {
-        const fileURL = window.URL.createObjectURL(blob);
-        let alink = document.createElement("a");
-        alink.href = fileURL;
-        alink.download = "downloaded.pdf";
-        alink.click();
-      });
-    });
+    
+   
   };
 
   // const pdfDocument = pdfjs.getDocument("/sample.pdf");

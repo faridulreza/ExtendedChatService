@@ -127,6 +127,7 @@ const kidsBookGenerator = async (job, done) => {
         file: pubURL,
         fileType: "pdf",
         message: "Generated!",
+        title: data.text,
       });
     });
     pdfDoc.end();

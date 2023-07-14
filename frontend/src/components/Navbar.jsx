@@ -13,16 +13,6 @@ const navbarItems = [
     title: "Chatbot",
     url: "/chatbot",
   },
-  {
-    id: 3,
-    title: "About",
-    url: "/about",
-  },
-  {
-    id: 4,
-    title: "Contact",
-    url: "/contact",
-  },
 ];
 const Navbar = () => {
   const navigate = useNavigate();

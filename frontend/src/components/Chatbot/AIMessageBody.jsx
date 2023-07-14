@@ -3,8 +3,16 @@ import React, { useEffect, useState } from "react";
 import { getDatabase, onValue, ref, remove, update } from "firebase/database";
 import { LineWave, FallingLines } from "react-loader-spinner";
 import { getAuth } from "firebase/auth";
-import { doc, getFirestore, updateDoc } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  getFirestore,
+  updateDoc,
+} from "firebase/firestore";
 import FileViewer from "./FileViewer";
+import { MdOutlineShare } from "react-icons/md";
+import { async } from "regenerator-runtime";
 
 const ERROR_FILE_PROSESSING = -1001;
 const ERROR_GETTING_CHAT_RESPONSE = -1002;
@@ -75,6 +83,7 @@ const HandleData = ({ data, chatID, update }) => {
       if (data.file) {
         obj[now_time].file = data.file;
         obj[now_time].fileType = data.fileType;
+        obj[now_time].title = data.fileType;
       }
 
       if (data.file) {
@@ -103,7 +112,26 @@ const HandleData = ({ data, chatID, update }) => {
 
   return (
     <div>
-      {data.file && <FileViewer file={data.file} fileType={data.fileType} />}
+      {data.file && (
+        <div style={{ position: "relative" }}>
+          <FileViewer file={data.file} fileType={data.fileType} />
+          <MdOutlineShare
+            size={30}
+            style={{
+              cursor: "pointer",
+            }}
+            onClick={async () => {
+              let dc = collection(getFirestore(), "shared");
+              await addDoc(dc, {
+                file: data.file,
+                fileType: data.fileType,
+                title: data.title,
+                author: getAuth().currentUser.displayName || "Unknown",
+              });
+            }}
+          />
+        </div>
+      )}
       {!isGenFile && <div style={{ whiteSpace: "pre-line" }}>{msg}</div>}
     </div>
   );
@@ -186,7 +214,24 @@ export const SimpleAI = ({ data }) => {
         </div>
         <div className="relative ml-3 text-md bg-indigo-300 py-2 px-4 shadow rounded-xl">
           {data.file && (
-            <FileViewer file={data.file} fileType={data.fileType} />
+            <div style={{ position: "relative" }}>
+              <FileViewer file={data.file} fileType={data.fileType} />
+              <MdOutlineShare
+                size={30}
+                style={{
+                  cursor: "pointer",
+                }}
+                onClick={async () => {
+                  let dc = collection(getFirestore(), "shared");
+                  await addDoc(dc, {
+                    file: data.file,
+                    fileType: data.fileType,
+                    title: data.title,
+                    author: getAuth().currentUser.displayName || "Unknown",
+                  });
+                }}
+              />
+            </div>
           )}
           {!data.file && (
             <div style={{ whiteSpace: "pre-line" }}>{data.content}</div>
