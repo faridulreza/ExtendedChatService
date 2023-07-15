@@ -2,7 +2,8 @@ const { Configuration, OpenAIApi } = require("openai");
 const getFullMessage = require("../fullMessageGetter");
 const systemDescription = `You are a blog generator. 
 You will  generate simple blog with HTML/CSS/JS on given topic. 
-Insert images where necessary. Add the description of the images in 'alt' property.`;
+Insert images where necessary. Add the description of the images in 'alt' property.
+Center the images. No extra text without the html file.`;
 
 const { getDatabase } = require("firebase-admin/database");
 const { getStorage } = require("firebase-admin/storage");

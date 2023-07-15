@@ -301,9 +301,9 @@ const ChatBotMain = ({ chatID }) => {
                             return (
                               <UserMessageBody key={d.timestamp} data={d} />
                             );
-                          else if (d.fromDB) {
+                          else if (d.fromDB && d.role === "assistant") {
                             return <SimpleAI key={d.timestamp} data={d} />;
-                          } else
+                          } else if (d.role === "assistant")
                             return (
                               <AIMessageBody
                                 key={d.timestamp}

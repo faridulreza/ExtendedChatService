@@ -4,10 +4,10 @@ import { Document } from "react-pdf";
 const PdfViewer = ({ file }) => {
   return (
     <React.Fragment>
-      <div className="w-[400px] h-[300px] flex justify-center items-center">
-        <div className="w-[400px] h-[300px] mt-5 p-5">
+      <div className=" flex justify-center items-center">
+        <div className=" mt-5 p-5">
           <a href={file} target="_blank">
-            <Document file={file} />
+            <img className="h-[200px] w-[200px]" src={"/img/pdf.png"} />
           </a>
         </div>
       </div>

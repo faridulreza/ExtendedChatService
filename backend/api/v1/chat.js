@@ -88,7 +88,7 @@ module.exports = async (req, res) => {
     //send response
     res.status(200).send();
   } catch (err) {
-    console.log(err);
+    console.log(err.response);
     res.status(405).json({
       message: "Please try again..",
       code: ERROR_GETTING_CHAT_RESPONSE,

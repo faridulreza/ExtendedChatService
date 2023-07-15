@@ -69,7 +69,9 @@ const ChatBotPage = () => {
               <li
                 key={i}
                 onClick={() => setNowChatID(a.chatID)}
-                className="px-3 py-2 border-[1px] border-gray-600 hover:bg-gray-700 rounded-md"
+                className={`px-3 py-2 ${
+                  a.chatID == nowChatID && "bg-[#2a5568]"
+                } border-[1px] border-gray-600 hover:bg-gray-700 rounded-md`}
               >
                 {a.name}
               </li>

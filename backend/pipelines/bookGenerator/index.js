@@ -2,7 +2,8 @@ const { Configuration, OpenAIApi } = require("openai");
 const getFullMessage = require("../fullMessageGetter");
 const systemDescription = `You are a book generator. You take any topic and generate a book. 
   Images are described in one line with keywords.
-  Add image as IMAGE: <description>. One chapter has at most 2 images.
+  Add image as IMAGE: <description>. THIS IMAGE DESCRIPTION MUST BE ON A NEW LINE.
+   One chapter has at most 2 images.
   One chapter must have less than 5 paragraph. Finish the book in less than 10 chapter.`;
 const imageToBase64 = require("image-to-base64");
 const PdfPrinter = require("pdfmake");
@@ -96,6 +97,8 @@ const bookGenerator = async (job, done) => {
       content: contents,
       defaultStyle: {
         font: "Courier",
+        lineHeight: 1.5,
+        alignment: "justify",
       },
       styles: {
         header: {
